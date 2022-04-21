@@ -1,0 +1,103 @@
+---
+title: "Atmospheric Conductance - Sensitivity Analysis"
+author: "Group J"
+date: "4/21/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(pse)
+library(tidyverse)
+
+source("compute_atmospheric_conductance.R")
+```
+
+```{r}
+compute_atmospheric_conductance()
+```
+
+For vegetation height assume that height is somewhere between 9.5 and 10.5 m (but any value in that range is equally likely).
+
+For the kd and k0 parameters you can assume that they are normally distributed with standard deviation of 1% of their default values.
+
+Windspeeds v are normally distributed with a mean of 250 cm/s with a standard deviation of 30 cm/s.
+
+
+
+```{r}
+factors = c("vegetation_ht", "k_d", "k_0", "windspeed")
+
+nsets = 100
+
+q = c("qunif", # vegetation height randomly distributed
+      "qnorm", # k_d normally distributed
+      "qnorm",
+      "qnorm"
+      )
+
+q.arg = list(list(min = 950, max = 1050), # vegetation height
+             list(mean = 0.7, sd = 0.7*0.01), 
+             list(mean = 0.1, sd = 0.1*0.01),
+             list(mean = 250, sd = 30))
+
+sens_conductance = LHS(NULL, factors, nsets, q, q.arg)
+sens_pars = get.data(sens_conductance)
+head(sens_pars)
+```
+
+
+
+```{r}
+conductances = sens_pars %>% pmap(compute_atmospheric_conductance)
+
+conductances_df = conductances %>% map_dfr(`[`, c("conductance"))
+
+sens_conductance = pse::tell(sens_conductance, t(as.matrix(conductances_df)),
+                             res.names = c("conductance"))
+```
+
+
+```{r}
+ggplot(conductances_df, aes(conductance)) +
+  geom_boxplot() +
+  coord_flip() +
+  theme_light()
+
+ggplot(conductances_df, aes(conductance)) +
+  geom_histogram() +
+  theme_light()
+```
+
+Part d.
+
+```{r}
+pse::plotscatter(sens_conductance)
+```
+
+Part e.
+
+```{r}
+pse::plotprcc(sens_conductance)
+```
+
+```{r}
+sens_conductance$prcc
+```
+
+```{r}
+cor(conductances_df$conductance, sens_pars$vegetation_ht, method = "spearman")
+cor(conductances_df$conductance, sens_pars$k_d, method = "spearman")
+cor(conductances_df$conductance, sens_pars$k_0, method = "spearman")
+cor(conductances_df$conductance, sens_pars$windspeed, method = "spearman")
+
+```
+
+
+f. 
+
+most impacted by windspeed
+focus on getting good windspeed
+
+
