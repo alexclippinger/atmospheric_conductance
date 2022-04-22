@@ -1,7 +1,7 @@
 ---
 title: "Atmospheric Conductance - Sensitivity Analysis"
-author: "Group J"
-date: "4/21/2022"
+author: "Group L: Genevieve Chiong, Peter Menzies, Alex Clippinger"
+date: '`r format(Sys.time(), "%m/%d/%Y")`'
 output: html_document
 ---
 
@@ -14,20 +14,27 @@ library(tidyverse)
 source("compute_atmospheric_conductance.R")
 ```
 
-```{r}
+
+# Parts 1-2. Create and Run Atmospheric Conductance Model
+
+The following model is sourced from "compute_atmospheric_conductance.R".
+
+```{r single_estimate}
 compute_atmospheric_conductance()
 ```
 
-For vegetation height assume that height is somewhere between 9.5 and 10.5 m (but any value in that range is equally likely).
-
-For the kd and k0 parameters you can assume that they are normally distributed with standard deviation of 1% of their default values.
-
-Windspeeds v are normally distributed with a mean of 250 cm/s with a standard deviation of 30 cm/s.
+The model's single estimate of atmospheric conductance (for a forest that is 10 m high, has wind speeds of 250 cm/s, and a wind speed measurement height (cm) of 200 cm above vegetation) is 15.44228 cm/s.
 
 
+# Part 3. Sensitivity Analysis
 
-```{r}
-factors = c("vegetation_ht", "k_d", "k_0", "windspeed")
+Vegetation height is assumed to be randomly distributed between 9.5 and 10.5 m. The k_d and k_0 parameters are assumed to be normally distributed with standard deviation of 1% of their default values. Wind speeds are normally distributed with a mean of 250 cm/s and standard deviation of 30 cm/s.
+
+
+### a. Use LHS to generate parameter values for the 4 parameters
+
+```{r lhs}
+factors = c("vegetation_ht", "k_d", "k_0", "wind_speed")
 
 nsets = 100
 
@@ -42,14 +49,16 @@ q.arg = list(list(min = 950, max = 1050), # vegetation height
              list(mean = 0.1, sd = 0.1*0.01),
              list(mean = 250, sd = 30))
 
+set.seed(1001)
 sens_conductance = LHS(NULL, factors, nsets, q, q.arg)
 sens_pars = get.data(sens_conductance)
 head(sens_pars)
 ```
 
 
+### b. Run atmospheric conductance model for these parameter sets
 
-```{r}
+```{r parameter_uncertainty}
 conductances = sens_pars %>% pmap(compute_atmospheric_conductance)
 
 conductances_df = conductances %>% map_dfr(`[`, c("conductance"))
@@ -59,45 +68,65 @@ sens_conductance = pse::tell(sens_conductance, t(as.matrix(conductances_df)),
 ```
 
 
-```{r}
-ggplot(conductances_df, aes(conductance)) +
-  geom_boxplot() +
-  coord_flip() +
-  theme_light()
+### c. Plot conductance estimates accounting for parameter uncertainty
 
-ggplot(conductances_df, aes(conductance)) +
-  geom_histogram() +
-  theme_light()
+Conductance estimates, accounting for parameter uncertainty, are displayed using a boxplot and histogram below. 
+
+```{r conductance_boxplot}
+ggplot(conductances_df, aes(y=conductance)) +
+  geom_boxplot() +
+  theme_light() +
+  labs(title = "Distribution of Conductance Estimates Given Parameter Uncertainty")
 ```
 
-Part d.
+```{r conductance_hist, warning=FALSE}
+ggplot(conductances_df, aes(conductance)) +
+  geom_histogram() +
+  theme_light() +
+  labs(title = "Distribution of Conductance Estimates Given Parameter Uncertainty")
+```
 
-```{r}
+
+### d. Plot conductance estimates against each parameter
+
+```{r conductance_scatter}
 pse::plotscatter(sens_conductance)
 ```
 
-Part e.
+The plots above indicate that there is a stronger relationship between wind speed uncertainty and conductance than that of the other three parameters.
 
-```{r}
+
+### e. Estimate the Partial Rank Correlation Coefficients (PRCC)
+
+The PRCC values are plotted and displayed below.
+
+```{r prcc_plot}
 pse::plotprcc(sens_conductance)
 ```
 
-```{r}
+```{r prcc_values}
 sens_conductance$prcc
 ```
 
-```{r}
-cor(conductances_df$conductance, sens_pars$vegetation_ht, method = "spearman")
-cor(conductances_df$conductance, sens_pars$k_d, method = "spearman")
-cor(conductances_df$conductance, sens_pars$k_0, method = "spearman")
-cor(conductances_df$conductance, sens_pars$windspeed, method = "spearman")
+Additionally, Spearman correlation for these four values are given below.
 
+```{r spearman}
+veg_cor = cor(conductances_df$conductance, sens_pars$vegetation_ht, method = "spearman")
+kd_cor = cor(conductances_df$conductance, sens_pars$k_d, method = "spearman")
+k0_cor = cor(conductances_df$conductance, sens_pars$k_0, method = "spearman")
+windspd_cor = cor(conductances_df$conductance, sens_pars$wind_speed, method = "spearman")
+
+parameters = c("Vegetation Height", "k_d", "k_0", "Wind Speed")
+cors = c(veg_cor, kd_cor, k0_cor, windspd_cor)
+
+tibble("Parameter" = parameters,
+       "Correlation" = cors)
 ```
 
 
-f. 
+### f. Discussion of Results
 
-most impacted by windspeed
-focus on getting good windspeed
+The results of our sensitivity analysis on atmospheric conductance indicate that conductance is most heavily impacted by uncertainty in wind speed. The other parameters - vegetation height, k_0, and k_d, are less impactful given uncertainty. This suggests that in order to reduce uncertainty in aerodynamic conductance estimates, the most important parameter to control for is wind speed. 
 
+Given this observation, climate change may exacerbate plant water use sensitivity if warmer climate results in higher wind speed conditions. 
 
