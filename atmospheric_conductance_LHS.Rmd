@@ -28,7 +28,7 @@ The model's single estimate of atmospheric conductance (for a forest that is 10 
 
 # Part 3. Sensitivity Analysis
 
-Vegetation height is assumed to be randomly distributed between 9.5 and 10.5 m. The k_d and k_0 parameters are assumed to be normally distributed with standard deviation of 1% of their default values. Wind speeds are normally distributed with a mean of 250 cm/s and standard deviation of 30 cm/s.
+Vegetation height is assumed to be randomly distributed between 9.5 and 10.5 m. The $k_d$ and $k_0$ parameters are assumed to be normally distributed with standard deviation of 1% of their default values. Wind speeds are normally distributed with a mean of 250 cm/s and standard deviation of 30 cm/s.
 
 
 ### a. Use LHS to generate parameter values for the 4 parameters
@@ -126,7 +126,7 @@ tibble("Parameter" = parameters,
 
 ### f. Discussion of Results
 
-The results of our sensitivity analysis on atmospheric conductance indicate that conductance is most heavily impacted by uncertainty in wind speed. The other parameters - vegetation height, k_0, and k_d, are less impactful given uncertainty. This suggests that in order to reduce uncertainty in aerodynamic conductance estimates, the most important parameter to control for is wind speed. 
+The results of our sensitivity analysis indicate that atmospheric conductance estimated by our model is most sensitive to uncertainty in wind speed. The other parameters - vegetation height, $k_0$, and $k_d$, are less impactful given uncertainty. This suggests that in order to reduce uncertainty in aerodynamic conductance estimates, the most important parameter to control for is wind speed. 
 
 Research has shown that global wind speeds have been decreasing for several decades since the 1970s, before picking up in 2010. In a study published in Nature Climate Change in 2019, researchers found that big climate patterns have a major influence of wind speeds and that winds across much of North America, Europe and Asia have been growing faster since about 2010. Given this, climate change may exacerbate plant water use sensitivity if warmer climate results in more volatile and uncertain wind speeds. 
 
