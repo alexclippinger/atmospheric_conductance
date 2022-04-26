@@ -13,7 +13,8 @@
 #' @export
 #'
 #' @examples
-#' compute_atmospheric_conductance(wind_speed=250, wind_speed_ht=NULL, k_d=0.7, k_0=0.1, vegetation_ht=1000)
+
+# compute_atmospheric_conductance(wind_speed=250, wind_speed_ht=NULL, k_d=0.7, k_0=0.1, vegetation_ht=1000)
 compute_atmospheric_conductance <- function(wind_speed = 250, 
                                             wind_speed_ht = NULL,  
                                             k_d = 0.7,

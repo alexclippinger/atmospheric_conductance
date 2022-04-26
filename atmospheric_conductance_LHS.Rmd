@@ -128,5 +128,14 @@ tibble("Parameter" = parameters,
 
 The results of our sensitivity analysis on atmospheric conductance indicate that conductance is most heavily impacted by uncertainty in wind speed. The other parameters - vegetation height, k_0, and k_d, are less impactful given uncertainty. This suggests that in order to reduce uncertainty in aerodynamic conductance estimates, the most important parameter to control for is wind speed. 
 
-Given this observation, climate change may exacerbate plant water use sensitivity if warmer climate results in higher wind speed conditions. 
+Research has shown that global wind speeds have been decreasing for several decades since the 1970s, before picking up in 2010. In a study published in Nature Climate Change in 2019, researchers found that big climate patterns have a major influence of wind speeds and that winds across much of North America, Europe and Asia have been growing faster since about 2010. Given this, climate change may exacerbate plant water use sensitivity if warmer climate results in more volatile and uncertain wind speeds. 
+
+
+**Citations**
+
+IPCC, 2021: Climate Change 2021: The Physical Science Basis. Contribution of Working Group I to the Sixth Assessment Report of the Intergovernmental Panel on Climate Change [Masson-Delmotte, V., P. Zhai, A. Pirani, S.L.Connors, C. Péan, S. Berger, N. Caud, Y. Chen, L. Goldfarb, M.I. Gomis, M. Huang, K. Leitzell, E. Lonnoy, J.B.R. Matthews, T.K. Maycock, T. Waterfield, O. Yelekçi, R. Yu, and B. Zhou (eds.)]. Cambridge University Press. In Press. 
+
+Zeng, Z., Ziegler, A.D., Searchinger, T. et al. A reversal in global terrestrial stilling and its implications for wind energy production. Nat. Clim. Chang. 9, 979–985 (2019). https://doi.org/10.1038/s41558-019-0622-6
+
+
 
